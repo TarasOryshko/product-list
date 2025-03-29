@@ -11,6 +11,9 @@ import {
   Button,
   Modal,
   Box,
+  Card,
+  CardContent,
+  CardMedia,
 } from "@mui/material";
 
 const ProductView: React.FC = () => {
@@ -27,7 +30,7 @@ const ProductView: React.FC = () => {
       name: "",
       count: 0,
       description: "",
-      imageUrl: undefined,
+      imageUrl: "",
     }
   );
 
@@ -47,19 +50,37 @@ const ProductView: React.FC = () => {
 
   return (
     <Container>
-      <Typography variant="h4">{product.name}</Typography>
-      <Typography variant="body1">{product.description}</Typography>
-      <Typography variant="body1">Count: {product.count}</Typography>
-      <Button variant="outlined" color="primary" onClick={() => setOpen(true)}>
-        Edit
-      </Button>
-      <Button
-        variant="outlined"
-        color="secondary"
-        onClick={handleDeleteProduct}
-      >
-        Delete
-      </Button>
+      <Card sx={{ maxWidth: 400, margin: "auto", mt: 4 }}>
+        <CardMedia
+          component="img"
+          alt={product.name}
+          height="300"
+          image={product.imageUrl}
+          title={product.name}
+        />
+        <CardContent>
+          <Typography variant="h4">{product.name}</Typography>
+          <Typography variant="body1">{product.description}</Typography>
+          <Typography variant="body1">Count: {product.count}</Typography>
+        </CardContent>
+
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={() => setOpen(true)}
+          sx={{ m: 2 }}
+        >
+          Edit Product
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={handleDeleteProduct}
+          sx={{ m: 2 }}
+        >
+          Delete Product
+        </Button>
+      </Card>
 
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box
@@ -106,12 +127,21 @@ const ProductView: React.FC = () => {
             }
             margin="normal"
           />
+          <TextField
+            fullWidth
+            label="Image URL"
+            value={updatedProduct.imageUrl}
+            onChange={(e) =>
+              setUpdatedProduct({ ...updatedProduct, imageUrl: e.target.value })
+            }
+            margin="normal"
+          />
           <Button
             variant="contained"
             onClick={handleUpdateProduct}
             sx={{ mt: 2 }}
           >
-            Save
+            Save Changes
           </Button>
           <Button
             variant="outlined"

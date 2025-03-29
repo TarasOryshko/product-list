@@ -8,14 +8,21 @@ import {
   Card,
   CardContent,
   CardMedia,
-  // Grid,
+  Grid,
   Button,
   Typography,
   Modal,
   Box,
   TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
 import { Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
@@ -23,6 +30,9 @@ const ProductList: React.FC = () => {
   const products = useSelector((state: RootState) => state.products.products);
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState<string>("name"); // Додаємо стан для сортування
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const [newProduct, setNewProduct] = useState({
     name: "",
     count: 0,
@@ -37,6 +47,22 @@ const ProductList: React.FC = () => {
     setOpen(false);
   };
 
+  const handleDeleteProduct = () => {
+    if (productToDelete) {
+      dispatch(removeProduct(productToDelete));
+      setDeleteOpen(false);
+    }
+  };
+
+  const sortedProducts = [...products].sort((a, b) => {
+    if (sortOrder === "name") {
+      return a.name.localeCompare(b.name);
+    } else if (sortOrder === "count") {
+      return a.count - b.count;
+    }
+    return 0;
+  });
+
   return (
     <Container>
       <Typography variant="h4" sx={{ mb: 2 }}>
@@ -46,15 +72,36 @@ const ProductList: React.FC = () => {
         Add Product
       </Button>
 
-      <Grid container spacing={3} sx={{ mt: 3 }}>
-        {products.map((product) => (
-          <Grid item xs={12} sm={6} md={4} key={product.id}>
-            {" "}
-            <Link
-              to={`/product/${product.id}`}
-              style={{ textDecoration: "none" }}
-            >
-              <Card sx={{ height: "100%" }}>
+      <FormControl sx={{ mt: 2, mb: 2 }}>
+        <InputLabel id="sort-select-label">Sort by</InputLabel>
+        <Select
+          labelId="sort-select-label"
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          label="Sort by"
+        >
+          <MenuItem value="name">Alphabetically</MenuItem>
+          <MenuItem value="count">By Count</MenuItem>
+        </Select>
+      </FormControl>
+
+      {/* <Grid container spacing={3} sx={{ mt: 3 }}> */}
+      <div
+        style={{
+          marginTop: "16px",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+          gap: "16px",
+        }}
+      >
+        {sortedProducts.map((product) => (
+          // <Grid item xs={12} sm={6} md={4} key={product.id}>
+          <div key={product.id} style={{ position: "relative" }}>
+            <Card sx={{ height: "100%" }}>
+              <Link
+                to={`/product/${product.id}`}
+                style={{ textDecoration: "none" }}
+              >
                 <CardMedia
                   component="img"
                   alt={product.name}
@@ -73,11 +120,24 @@ const ProductList: React.FC = () => {
                     Count: {product.count}
                   </Typography>
                 </CardContent>
-              </Card>
-            </Link>
-          </Grid>
+              </Link>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() => {
+                  setProductToDelete(product.id);
+                  setDeleteOpen(true);
+                }}
+                sx={{ position: "absolute", bottom: 8, right: 8 }}
+              >
+                Delete
+              </Button>
+            </Card>
+            {/* </Grid> */}
+          </div>
         ))}
-      </Grid>
+      </div>
+      {/* </Grid> */}
 
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box
@@ -139,6 +199,22 @@ const ProductList: React.FC = () => {
           </Button>
         </Box>
       </Modal>
+
+      {/* Dialog for Deleting Product */}
+      <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this product?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteProduct} color="secondary">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
