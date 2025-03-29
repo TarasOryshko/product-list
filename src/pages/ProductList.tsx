@@ -1,5 +1,5 @@
 // src/pages/ProductList.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../redux/store";
 import { addProduct, removeProduct } from "../redux/ProductSlice";
@@ -85,19 +85,10 @@ const ProductList: React.FC = () => {
         </Select>
       </FormControl>
 
-      {/* <Grid container spacing={3} sx={{ mt: 3 }}> */}
-      <div
-        style={{
-          marginTop: "16px",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-          gap: "16px",
-        }}
-      >
+      <Grid container spacing={3} sx={{ mt: 3 }}>
         {sortedProducts.map((product) => (
-          // <Grid item xs={12} sm={6} md={4} key={product.id}>
-          <div key={product.id} style={{ position: "relative" }}>
-            <Card sx={{ height: "100%" }}>
+          <Grid item xs={12} sm={6} md={4} key={product.id}>
+            <Card sx={{ height: "100%", position: "relative" }}>
               <Link
                 to={`/product/${product.id}`}
                 style={{ textDecoration: "none" }}
@@ -133,11 +124,9 @@ const ProductList: React.FC = () => {
                 Delete
               </Button>
             </Card>
-            {/* </Grid> */}
-          </div>
+          </Grid>
         ))}
-      </div>
-      {/* </Grid> */}
+      </Grid>
 
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box
